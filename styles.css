@@ -1,0 +1,30 @@
+body {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+#container {
+  margin-top: 200px;
+  padding: 16px 16px;
+  width: 125px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid black;
+}
+
+#display {
+  border: 1px solid black;
+  height: 24px;
+  width: 125px;
+  padding: 2px 2px;
+  margin: auto;
+  text-align: right;
+}
+
+#buttons {
+  display: flex;
+}
+
+
