@@ -28,14 +28,20 @@ function operate(operator, x, y) {
 }
 
 let displayValue = '';
+let hasDefaultZero = true;
 const display = document.getElementById('display');
 
 /**
  * Used for displaying numbers.
  */
 function displayNumber() {
-    displayValue += this.textContent;
-    display.textContent = `${displayValue}`;
+    if (hasDefaultZero && this.textContent !== '0') {
+        hasDefaultZero = false;
+    }
+    if (!hasDefaultZero) {
+        displayValue += this.textContent;
+        display.textContent = `${displayValue}`;
+    }
 }
 
 function clearDisplay() {
@@ -57,11 +63,16 @@ function evaluate() {
     let token = '';
     let valueStack = [];
     let opStack = [];
+    let wasNumber = false;
     for (let i = 0; i < displayValue.length; i++) {
         token = displayValue.charAt(i);
-        if (Number.isInteger(Number(token))) {
+        if (wasNumber && Number.isInteger(Number(token))) {
+            valueStack[valueStack.length - 1] += token;
+        } else if (Number.isInteger(Number(token))) {
+            wasNumber = true;
             valueStack.push(token);
         } else {
+            wasNumber = false;
             while (opStack.length > 0 && precedence[opStack[opStack.length - 1]]
                 >= precedence[`${token}`]) {
                 let secondVal = valueStack.pop();
