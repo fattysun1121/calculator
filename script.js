@@ -59,7 +59,7 @@ function displayToken() {
         if (!wasNumber) {
             displayValue = displayValue.substring(0, displayValue.length - 1);
         } else if (isSecondOp()) {
-            displayValue = evaluate();
+            displayValue = evaluate().toString();
         }
         op = token;
         displayValue += token;
@@ -112,7 +112,7 @@ function setUp() {
 
     const equals = document.getElementById('equals-button');
     equals.addEventListener('click', () => {
-        displayValue = evaluate();
+        displayValue = evaluate().toString();
         display.textContent = `${displayValue}`;
     });
 
