@@ -31,13 +31,12 @@ const OPERATORS = ['+', '-', '×', '÷'];
 let displayValue = '0';
 let firstDigitIsZero = true;
 let wasNumber = true;
+let op = '';
 const display = document.getElementById('display');
-
 
 
 /**
  * Displays numbers and operators and save them for later evaluation.
- *
  */
 function displayToken() {
     let token = this.textContent;
@@ -56,30 +55,40 @@ function displayToken() {
         displayValue += token;
         display.textContent = `${displayValue}`;
         wasNumber = true;
-    } else if (!OPERATORS.includes(displayValue.charAt(displayValue.length - 1)) && wasNumber) {
-        if (isSecondOp()) {
-
+    } else {
+        if (!wasNumber) {
+            displayValue = displayValue.substring(0, displayValue.length - 1);
+        } else if (isSecondOp()) {
+            displayValue = evaluate();
         }
+        op = token;
         displayValue += token;
         display.textContent = `${displayValue}`;
+        firstDigitIsZero = false;
         wasNumber = false;
     }
 }
 
+function evaluate() {
+    let firstNum = displayValue.substring(0, displayValue.indexOf(op));
+    let secondNum = displayValue.substring(displayValue.indexOf(op) + 1);
 
+    return operate(op, firstNum, secondNum);
+}
 
 function isSecondOp() {
     const expression = displayValue.split('');
-    expression.forEach(token => {
+    for (let token of expression) {
         if (OPERATORS.includes(token)) {
             return true;
         }
-    });
+    }
     return false;
 }
 function clearDisplay() {
     display.textContent = '0';
     displayValue = '0';
+    firstDigitIsZero = true;
 
 }
 
@@ -102,7 +111,10 @@ function setUp() {
     operators.forEach((operator) => operator.addEventListener('click', displayToken));
 
     const equals = document.getElementById('equals-button');
-
+    equals.addEventListener('click', () => {
+        displayValue = evaluate();
+        display.textContent = `${displayValue}`;
+    });
 
     const clear = document.getElementById('clear-button');
     clear.addEventListener('click', clearDisplay);
