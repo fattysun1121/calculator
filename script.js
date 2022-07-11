@@ -15,24 +15,32 @@ function divide(x, y) {
 }
 
 function operate(operator, x, y) {
+    let result;
     switch (operator) {
         case '+':
-            return add(x, y);
+            result = add(x, y);
+            break;
         case '-':
-            return subtract(x, y);
+            result = subtract(x, y);
+            break;
         case '×':
-            return multiply(x, y);
+            result = multiply(x, y);
+            break;
         case '÷':
-            return divide(x, y);
+            result = divide(x, y);
+            break;
     }
+    return Math.round(result * 1000) / 1000;
 }
 
 const OPERATORS = ['+', '-', '×', '÷'];
 let displayValue = '0';
 let firstDigitIsZero = true;
 let wasNumber = true;
+let hasDot = false;
 let op = '';
 const display = document.getElementById('display');
+
 
 
 /**
@@ -53,23 +61,24 @@ function displayToken() {
             if (!wasNumber && token === '0') {  // record if user inputs a zero after an operator
                 firstDigitIsZero = true;
             }
-
-            displayValue += token;
-            display.textContent = `${displayValue}`;
             wasNumber = true;
-        } else {
+        } else if (OPERATORS.includes(token)) {
             if (!wasNumber) {
                 displayValue = displayValue.substring(0, displayValue.length - 1);
             } else if (isSecondOp()) {
                 displayValue = evaluate().toString();
             }
-
             op = token;
-            displayValue += token;
-            display.textContent = `${displayValue}`;
             firstDigitIsZero = false;
             wasNumber = false;
+            hasDot = false;
+        } else if (hasDot){
+            return
+        } else {
+            hasDot = true;
         }
+        displayValue += token;
+        display.textContent = `${displayValue}`;
     }
 }
 
@@ -77,7 +86,7 @@ function evaluate() {
     let firstNum = displayValue.substring(0, displayValue.indexOf(op));
     let secondNum = displayValue.substring(displayValue.indexOf(op) + 1);
 
-    if (!secondNum) {
+    if (!secondNum || !op) {
         return displayValue;
     }
     return operate(op, firstNum, secondNum);
@@ -117,9 +126,13 @@ function setUp() {
     const operators = Array.from(document.querySelectorAll('.operator'));
     operators.forEach((operator) => operator.addEventListener('click', displayToken));
 
+    const dot = document.getElementById('dot');
+    dot.addEventListener('click', displayToken);
+
     const equals = document.getElementById('equals-button');
     equals.addEventListener('click', () => {
         displayValue = evaluate().toString();
+        op = '';
         display.textContent = `${displayValue}`;
     });
 
