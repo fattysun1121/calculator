@@ -23,17 +23,24 @@ function operate(operator, x, y) {
         case '-':
             result = subtract(x, y);
             break;
-        case '×':
+        case '*':
             result = multiply(x, y);
             break;
-        case '÷':
+        case '/':
             result = divide(x, y);
             break;
     }
     return Math.round(result * 1000) / 1000;
 }
 
-const OPERATORS = ['+', '-', '×', '÷'];
+const precedence = {
+    '+': 0,
+    '-': 0,
+    '*': 1,
+    '/': 1,
+}
+
+const OPERATORS = ['+', '-', '*', '/'];
 let displayValue = '0';
 let firstDigitIsZero = true;
 let wasNumber = true;
@@ -101,6 +108,7 @@ function isSecondOp() {
     }
     return false;
 }
+
 function clearDisplay() {
     display.textContent = '0';
     displayValue = '0';
@@ -108,20 +116,41 @@ function clearDisplay() {
 
 }
 
-const precedence = {
-    '+': 0,
-    '-': 0,
-    '×': 1,
-    '÷': 1,
+function del() {
+    if (OPERATORS.includes(displayValue.charAt(displayValue.length - 1))) {
+        op = '';
+    }
+    if (displayValue.length === 1) {
+        displayValue = '0';
+        firstDigitIsZero = true;
+    } else {
+        displayValue = displayValue.substring(0, displayValue.length - 1);
+    }
+    display.textContent = `${displayValue}`;
 }
 
+
+function keyDown(e) {
+    const buttons = Array.from(document.querySelectorAll('button'));
+
+    if (e.keyCode === 8) {
+        del();
+    } else if (e.keyCode === 67) {
+        clearDisplay();
+    } else if (e.keyCode === 13){
+        document.getElementById('equals-button').click();
+    } else {
+        const buttons = Array.from(document.querySelectorAll('button')).filter(b => b.innerHTML == e.key);
+        buttons[0].click();
+    }
+}
 
 /**
  * For simplicity, use this function to Hook up buttons to event listeners.
  */
 function setUp() {
     const numbers = Array.from(document.querySelectorAll('.number'));
-    numbers.forEach((number) => number.addEventListener('click', displayToken));
+    numbers.forEach(number => number.onclick = displayToken);
 
     const operators = Array.from(document.querySelectorAll('.operator'));
     operators.forEach((operator) => operator.addEventListener('click', displayToken));
@@ -138,6 +167,12 @@ function setUp() {
 
     const clear = document.getElementById('clear-button');
     clear.addEventListener('click', clearDisplay);
+
+    const deleteB = document.getElementById('delete-button');
+    deleteB.addEventListener('click', del);
+
+    // keyboard support
+    window.addEventListener('keydown', keyDown);
 }
 
 setUp();
