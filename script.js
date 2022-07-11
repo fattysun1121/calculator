@@ -11,7 +11,7 @@ function multiply(x, y) {
 }
 
 function divide(x, y) {
-    return Number(y) === 0 ? 'OOPS' : Number(x) / Number(y);
+    return Number(y) === 0 ? 'ERROR' : Number(x) / Number(y);
 }
 
 function operate(operator, x, y) {
@@ -39,33 +39,37 @@ const display = document.getElementById('display');
  * Displays numbers and operators and save them for later evaluation.
  */
 function displayToken() {
-    let token = this.textContent;
+    if (displayValue !== 'ERROR')
+    {
+        let token = this.textContent;
 
-    if (Number.isInteger(Number(token))) {
-        if (firstDigitIsZero) {  // For convenience, give the calculator a default value of
-            if (token !== '0') {    // 0. If the user inputs another number, replace the zero
-                firstDigitIsZero = false;  // by it.
+        if (Number.isInteger(Number(token))) {
+            if (firstDigitIsZero) {  // For convenience, give the calculator a default value of
+                if (token !== '0') {    // 0. If the user inputs another number, replace the zero
+                    firstDigitIsZero = false;  // by it.
+                }
+                displayValue = displayValue.substring(0, displayValue.length - 1);
             }
-            displayValue = displayValue.substring(0, displayValue.length - 1);
-        }
-        if (!wasNumber && token === '0') {  // record if user inputs a zero after an operator
-            firstDigitIsZero = true;
-        }
+            if (!wasNumber && token === '0') {  // record if user inputs a zero after an operator
+                firstDigitIsZero = true;
+            }
 
-        displayValue += token;
-        display.textContent = `${displayValue}`;
-        wasNumber = true;
-    } else {
-        if (!wasNumber) {
-            displayValue = displayValue.substring(0, displayValue.length - 1);
-        } else if (isSecondOp()) {
-            displayValue = evaluate().toString();
+            displayValue += token;
+            display.textContent = `${displayValue}`;
+            wasNumber = true;
+        } else {
+            if (!wasNumber) {
+                displayValue = displayValue.substring(0, displayValue.length - 1);
+            } else if (isSecondOp()) {
+                displayValue = evaluate().toString();
+            }
+
+            op = token;
+            displayValue += token;
+            display.textContent = `${displayValue}`;
+            firstDigitIsZero = false;
+            wasNumber = false;
         }
-        op = token;
-        displayValue += token;
-        display.textContent = `${displayValue}`;
-        firstDigitIsZero = false;
-        wasNumber = false;
     }
 }
 
@@ -73,6 +77,9 @@ function evaluate() {
     let firstNum = displayValue.substring(0, displayValue.indexOf(op));
     let secondNum = displayValue.substring(displayValue.indexOf(op) + 1);
 
+    if (!secondNum) {
+        return displayValue;
+    }
     return operate(op, firstNum, secondNum);
 }
 
